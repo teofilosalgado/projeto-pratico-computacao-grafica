@@ -1,0 +1,9 @@
+[submodule "vendor/src/glm"]
+	path = vendor/src/glm
+	url = git@github.com:g-truc/glm.git
+[submodule "vendor/src/stb"]
+	path = vendor/src/stb
+	url = git@github.com:nothings/stb.git
+[submodule "vendor/src/imgui"]
+	path = vendor/src/imgui
+	url = git@github.com:ocornut/imgui.git
