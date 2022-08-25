@@ -69,7 +69,7 @@ int main(void) {
 	GLuint texture_uniform = glGetUniformLocation(shader->program_id, "texture"); 
 
 	// Lê o modelo
-	Model* cube = new Model("assets\\models\\mapa", "mapa.obj");
+	Model* cube = new Model("assets\\models", "cube.obj");
 
 	GLuint vertex_array_id;
 	glGenVertexArrays(1, &vertex_array_id);
