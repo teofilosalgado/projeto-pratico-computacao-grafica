@@ -45,8 +45,8 @@ int main(void) {
 	// Esconde o cursor do mouse e libera o movimento completo
 	// glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
-	// Define a cor de fundo como azul escuro
-	glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
+	// Define a cor de fundo como preto
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
 	// Centraliza o cursor do mouse
 	glfwPollEvents();
@@ -69,11 +69,11 @@ int main(void) {
 	GLuint texture_uniform = glGetUniformLocation(shader->program_id, "texture"); 
 
 	// Lê o modelo
-	Model* cube = new Model("assets\\models", "cube.obj");
+	Model* cube = new Model("assets\\models\\mapa", "mapa.obj");
 
-	GLuint VertexArrayID;
-	glGenVertexArrays(1, &VertexArrayID);
-	glBindVertexArray(VertexArrayID);
+	GLuint vertex_array_id;
+	glGenVertexArrays(1, &vertex_array_id);
+	glBindVertexArray(vertex_array_id);
 
 	GLuint vertexbuffer;
 	glGenBuffers(1, &vertexbuffer);
@@ -92,11 +92,11 @@ int main(void) {
 	//   Campode visão: 45° 
 	//   Aspecto: WINDOW_WIDTH/WINDOW_HEIGHT
 	//   Intervalo de exibição: 0.1 <-> 100
-	glm::mat4 projection = glm::perspective(glm::radians(45.0f), static_cast<float>(WINDOW_WIDTH) / static_cast<float>(WINDOW_HEIGHT), 0.1f, 100.0f);
+	glm::mat4 projection = glm::perspective(glm::radians(45.0f), static_cast<float>(WINDOW_WIDTH) / static_cast<float>(WINDOW_HEIGHT), 0.1f, 1000.0f);
 
 	// Matrix da câmera (visão)
 	glm::mat4 view = glm::lookAt(
-		glm::vec3(3, 3, 3),   // câmera se encontra em (3, 3, 3) no espaço
+		glm::vec3(100, 100, 100),   // câmera se encontra em (3, 3, 3) no espaço
 		glm::vec3(0, 0, 0),   // olhando para a origem
 		glm::vec3(0, 1, 0)    // na orientação correta (cabeça pra cima)
 	);
@@ -149,8 +149,8 @@ int main(void) {
 			(void*)0                          // array buffer offset
 		);
 
-		// Draw the triangle !
-		glDrawArrays(GL_TRIANGLES, 0, 12 * 3); // 12*3 indices starting at 0 -> 12 triangles
+		// Desenha os vértices da cena
+		glDrawArrays(GL_TRIANGLES, 0, cube->vertices.size());
 
 		glDisableVertexAttribArray(0);
 		glDisableVertexAttribArray(1);
