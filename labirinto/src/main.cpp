@@ -96,7 +96,7 @@ int main(void) {
 
 	// Matrix da câmera (visão)
 	glm::mat4 view = glm::lookAt(
-		glm::vec3(100, 100, 100),   // câmera se encontra em (3, 3, 3) no espaço
+		glm::vec3(3, 3, 3),   // câmera se encontra em (3, 3, 3) no espaço
 		glm::vec3(0, 0, 0),   // olhando para a origem
 		glm::vec3(0, 1, 0)    // na orientação correta (cabeça pra cima)
 	);
