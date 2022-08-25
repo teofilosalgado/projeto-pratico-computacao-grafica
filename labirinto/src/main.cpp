@@ -60,22 +60,16 @@ int main(void) {
 	glEnable(GL_CULL_FACE);
 
 	// Cria e compila os shaders
-	Shader* shader = new Shader("shaders\\cube.vert", "shaders\\cube.frag");
-	GLuint programID = shader->program_id;
+	Shader* shader = new Shader("shaders\\default.vert", "shaders\\default.frag");
 
 	// Carrega a textura
 	Texture* texture = new Texture("assets\\textures\\cube.png");
 
-	// Obtém um handle para a uniforme "myTextureSampler"
-	GLuint TextureID = glGetUniformLocation(programID, "myTextureSampler"); 
-
-
-	// Monta a matrix de projeção
-	// Get a handle for our "MVP" uniform
-	GLuint MatrixID = glGetUniformLocation(programID, "MVP");
+	// Obtém um handle para a uniforme no shader de fragmento responsável pela textura
+	GLuint texture_uniform = glGetUniformLocation(shader->program_id, "texture"); 
 
 	// Lê o modelo
-	Model* model = new Model("assets\\models", "cube.obj");
+	Model* cube = new Model("assets\\models", "cube.obj");
 
 	GLuint VertexArrayID;
 	glGenVertexArrays(1, &VertexArrayID);
@@ -84,43 +78,52 @@ int main(void) {
 	GLuint vertexbuffer;
 	glGenBuffers(1, &vertexbuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-	glBufferData(GL_ARRAY_BUFFER, model->vertices.size() * sizeof(glm::vec3), &model->vertices[0], GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, cube->vertices.size() * sizeof(glm::vec3), &cube->vertices[0], GL_STATIC_DRAW);
 
 	GLuint uvbuffer;
 	glGenBuffers(1, &uvbuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
-	glBufferData(GL_ARRAY_BUFFER, model->uvs.size() * sizeof(glm::vec2), &model->uvs[0], GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, cube->uvs.size() * sizeof(glm::vec2), &cube->uvs[0], GL_STATIC_DRAW);
 
-	// Projection matrix : 45° Field of View, 4:3 ratio, display range : 0.1 unit <-> 100 units
-	glm::mat4 Projection = glm::perspective(glm::radians(45.0f), 4.0f / 3.0f, 0.1f, 100.0f);
-	// Camera matrix
-	glm::mat4 View = glm::lookAt(
-		glm::vec3(4, 3, 3), // Camera is at (4,3,3), in World Space
-		glm::vec3(0, 0, 0), // and looks at the origin
-		glm::vec3(0, 1, 0)  // Head is up (set to 0,-1,0 to look upside-down)
+	// Obtém um handle para a uniforme no shader de vértice responsável pela matriz mvp
+	GLuint mvp_uniform = glGetUniformLocation(shader->program_id, "mvp");
+
+	// Matrix de projeção 
+	//   Campode visão: 45° 
+	//   Aspecto: WINDOW_WIDTH/WINDOW_HEIGHT
+	//   Intervalo de exibição: 0.1 <-> 100
+	glm::mat4 projection = glm::perspective(glm::radians(45.0f), static_cast<float>(WINDOW_WIDTH) / static_cast<float>(WINDOW_HEIGHT), 0.1f, 100.0f);
+
+	// Matrix da câmera (visão)
+	glm::mat4 view = glm::lookAt(
+		glm::vec3(3, 3, 3),   // câmera se encontra em (3, 3, 3) no espaço
+		glm::vec3(0, 0, 0),   // olhando para a origem
+		glm::vec3(0, 1, 0)    // na orientação correta (cabeça pra cima)
 	);
-	// Model matrix : an identity matrix (model will be at the origin)
-	glm::mat4 Model = glm::mat4(1.0f);
-	// Our ModelViewProjection : multiplication of our 3 matrices
-	glm::mat4 MVP = Projection * View * Model; // Remember, matrix multiplication is the other way around
+	
+	// Matrix do modelo na origem
+	glm::mat4 model = glm::mat4(1.0f);
+
+	// Monta a matrix de projeção
+	glm::mat4 mvp = projection * view * model;
 
 	// Enquanto o usuário não fechar a janela:
 	while (!glfwWindowShouldClose(window)) {
 		// Limpa a tela
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		// Use our shader
-		glUseProgram(programID);
+		// Habilita o shader
+		glUseProgram(shader->program_id);
 
-		// Send our transformation to the currently bound shader, 
-		// in the "MVP" uniform
-		glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
+		// Envia a mvp para o shader sob a uniforme de mesmo nome
+		glUniformMatrix4fv(mvp_uniform, 1, GL_FALSE, &mvp[0][0]);
 
-		// Bind our texture in Texture Unit 0
+		// Vincula a textura na unidade de textura 0
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, texture->texture_id);
-		// Set our "myTextureSampler" sampler to use Texture Unit 0
-		glUniform1i(TextureID, 0);
+
+		// Envia a textura para o uniforme no shader
+		glUniform1i(texture_uniform, 0);
 
 		// 1rst attribute buffer : vertices
 		glEnableVertexAttribArray(0);
