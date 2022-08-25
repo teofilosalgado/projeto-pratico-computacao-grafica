@@ -7,3 +7,6 @@
 [submodule "vendor/src/imgui"]
 	path = vendor/src/imgui
 	url = git@github.com:ocornut/imgui.git
+[submodule "vendor/src/tinyobjloader"]
+	path = vendor/src/tinyobjloader
+	url = git@github.com:tinyobjloader/tinyobjloader.git
