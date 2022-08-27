@@ -13,7 +13,6 @@ public:
 	void move_eye(glm::vec3 delta_eye);
 	void move_center(glm::vec3 delta_center);
 
-
 	glm::mat4 projection;
 	glm::mat4 view;
 	glm::vec3 eye;
