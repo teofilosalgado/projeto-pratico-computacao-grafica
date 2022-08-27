@@ -77,20 +77,20 @@ int main(void) {
 	glBindVertexArray(vertex_array_id);
 
 	// Cria um VBO para os vértices
-	GLuint vertexbuffer;
-	glGenBuffers(1, &vertexbuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-	glBufferData(GL_ARRAY_BUFFER, cube->vertices.size() * sizeof(glm::vec3), &cube->vertices[0], GL_STATIC_DRAW);
+	GLuint vertex_buffer;
+	glGenBuffers(1, &vertex_buffer);
+	glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
+	glBufferData(GL_ARRAY_BUFFER, cube->vertices.size() * sizeof(glm::vec3), nullptr, GL_DYNAMIC_DRAW);
 
 	// Cria um VBO para as texturas (uvs)
-	GLuint uvbuffer;
-	glGenBuffers(1, &uvbuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
-	glBufferData(GL_ARRAY_BUFFER, cube->uvs.size() * sizeof(glm::vec2), &cube->uvs[0], GL_STATIC_DRAW);
+	GLuint uv_buffer;
+	glGenBuffers(1, &uv_buffer);
+	glBindBuffer(GL_ARRAY_BUFFER, uv_buffer);
+	glBufferData(GL_ARRAY_BUFFER, cube->uvs.size() * sizeof(glm::vec2), nullptr, GL_DYNAMIC_DRAW);
 
 	// Mapeando o VBO de vértices para o VAO
 	glEnableVertexAttribArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
 	glVertexAttribPointer(
 		0,        // Posição do VBO
 		3,        // Tamanho
@@ -102,7 +102,7 @@ int main(void) {
 
 	// Mapeando o VBO de texturas (uvs) para o VAO
 	glEnableVertexAttribArray(1);
-	glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, uv_buffer);
 	glVertexAttribPointer(
 		1,        // Posição do VBO
 		2,        // Tamanho
@@ -151,6 +151,14 @@ int main(void) {
 
 		// Envia a textura para o uniforme no shader
 		glUniform1i(texture_uniform, 0);
+
+		// Carrega os vértices dos modelos no buffer dedicado
+		glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, cube->vertices.size() * sizeof(glm::vec3), cube->vertices.data());
+
+		// Carrega as texturas (uvs) dos modelos no buffer dedicado
+		glBindBuffer(GL_ARRAY_BUFFER, uv_buffer);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, cube->uvs.size() * sizeof(glm::vec2), cube->uvs.data());
 
 		// Desenha os vértices da cena
 		glDrawArrays(GL_TRIANGLES, 0, cube->vertices.size());
