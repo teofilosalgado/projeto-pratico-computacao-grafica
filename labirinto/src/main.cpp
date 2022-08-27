@@ -15,75 +15,6 @@ constexpr int WINDOW_WIDTH = 720;
 constexpr int WINDOW_HEIGHT = 480;
 constexpr int MOUSE_SPEED = 0.000f;
 
-bool firstMouse = true;
-float yaw = -90.0f;	// yaw is initialized to -90.0 degrees since a yaw of 0.0 results in a direction vector pointing to the right so we initially rotate a bit to the left.
-float pitch = 0.0f;
-float lastX = 800.0f / 2.0;
-float lastY = 600.0 / 2.0;
-float fov = 45.0f;
-
-float deltaTime = 0.0f;	// time between current frame and last frame
-float lastFrame = 0.0f;
-
-glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
-glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
-glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
-
-void processInput(GLFWwindow* window)
-{
-	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-		glfwSetWindowShouldClose(window, true);
-
-	float cameraSpeed = static_cast<float>(2.5 * deltaTime);
-	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-		cameraPos += cameraSpeed * cameraFront;
-	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-		cameraPos -= cameraSpeed * cameraFront;
-	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-		cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
-	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-		cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
-	cameraPos.y = 0.0;
-}
-
-void mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
-{
-	float xpos = static_cast<float>(xposIn);
-	float ypos = static_cast<float>(yposIn);
-
-	if (firstMouse)
-	{
-		lastX = xpos;
-		lastY = ypos;
-		firstMouse = false;
-	}
-
-	float xoffset = xpos - lastX;
-	float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
-	lastX = xpos;
-	lastY = ypos;
-
-	float sensitivity = 0.1f; // change this value to your liking
-	xoffset *= sensitivity;
-	yoffset *= sensitivity;
-
-	yaw += xoffset;
-	pitch += yoffset;
-
-	// make sure that when pitch is out of bounds, screen doesn't get flipped
-	if (pitch > 89.0f)
-		pitch = 89.0f;
-	if (pitch < -89.0f)
-		pitch = -89.0f;
-
-	glm::vec3 front;
-	front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-	front.y = sin(glm::radians(pitch));
-	front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
-	cameraFront = glm::normalize(front);
-}
-
-
 int main(void) {
 	GLFWwindow* window;
 
@@ -99,7 +30,7 @@ int main(void) {
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 	// Cria uma nova janela
-	window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Hello World", NULL, NULL);
+	window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Projeto de Computação Gráfica", NULL, NULL);
 	if (!window) {
 		glfwTerminate();
 		return -1;
@@ -138,12 +69,9 @@ int main(void) {
 	// Cria e compila os shaders
 	Shader* shader = new Shader("shaders\\default.vert", "shaders\\default.frag");
 	// Cria uma câmera para a cena
-	Camera* camera = new Camera(45.0f, WINDOW_WIDTH, WINDOW_HEIGHT, cameraPos, cameraFront);
+	Camera* camera = new Camera(45.0f, WINDOW_WIDTH, WINDOW_HEIGHT, glm::vec3(1.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
 	// Cria uma nova cena
 	Scene* scene = new Scene(shader, camera);
-
-	// Callback 
-	glfwSetCursorPosCallback(window, mouse_callback);
 
 	// Carrega a textura
 	Texture* bricks_texture = new Texture("assets\\textures\\bricks.png");
@@ -156,7 +84,7 @@ int main(void) {
 	// Cria um objeto para o cubo
 	//Object* cube1 = new Object(cube_model, bricks_texture, 0.0f, 0.0f, 0.0f, 1.0f);
 	//Object* cube2 = new Object(cube_model, stone_texture, -1.25f, -0.25f, 0.75f, 0.5f);
-	Object* cube3 = new Object(cube_model, bricks_texture, glm::vec3(-2.0f, -2.0f, -2.0f), 1.0f);
+	Object* cube3 = new Object(cube_model, bricks_texture, glm::vec3(-2.0f, 0.0f, -2.0f), 1.0f);
 
 	//scene->objects.push_back(cube1);
 	//scene->objects.push_back(cube2);
@@ -172,18 +100,11 @@ int main(void) {
 
 	// Enquanto o usuário não fechar a janela:
 	while (!glfwWindowShouldClose(window)) {
-		float currentFrame = static_cast<float>(glfwGetTime());
-		deltaTime = currentFrame - lastFrame;
-		lastFrame = currentFrame;
-
-		processInput(window);
-
 		// Renderiza a cena
 		scene->render();
 
 		// Atualiza os valores necessários
-		scene->camera->move_eye_to(cameraPos);
-		scene->camera->move_center_to(cameraFront);
+
 
 		// Janela do ImGui
 		ImGui_ImplOpenGL3_NewFrame();
@@ -191,8 +112,6 @@ int main(void) {
 		ImGui::NewFrame();
 
 		ImGui::Begin("Projeto de Computação Gráfica");
-		ImGui::Text("eye = %f %f %f", cameraPos.x, cameraPos.y, cameraPos.z);
-		ImGui::Text("center = %f %f %f", cameraFront.x, cameraFront.y, cameraFront.z);
 		ImGui::End();
 
 		ImGui::Render();
