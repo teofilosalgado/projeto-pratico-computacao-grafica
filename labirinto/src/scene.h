@@ -19,6 +19,8 @@ public:
 
 	GLuint texture_uniform;
 
+	GLuint scale_uniform;
+
 	GLuint vertex_buffer;
 	GLuint uv_buffer;
 };

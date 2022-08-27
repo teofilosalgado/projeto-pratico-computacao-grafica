@@ -14,6 +14,9 @@ Scene::Scene(Shader* shader, Camera* camera)
 	this->view_uniform = glGetUniformLocation(this->shader->program_id, "view");
 	this->projection_uniform = glGetUniformLocation(this->shader->program_id, "projection");
 
+	// Obtém um handle para a uniforme scale no shader de vértice responsável pela escala
+	this->scale_uniform = glGetUniformLocation(this->shader->program_id, "scale");
+
 	// Obtém um handle para a uniforme sampler no shader de fragmento responsável pela textura
 	this->texture_uniform = glGetUniformLocation(this->shader->program_id, "sampler");
 
@@ -65,7 +68,7 @@ void Scene::render()
 	// Habilita o shader
 	glUseProgram(this->shader->program_id);
 
-	// Envia a VP para o shader sob a uniforme de mesmo nome
+	// Define a VP para o shader sob a uniforme de mesmo nome
 	glUniformMatrix4fv(this->view_uniform, 1, GL_FALSE, &this->camera->view[0][0]);
 	glUniformMatrix4fv(this->projection_uniform, 1, GL_FALSE, &this->camera->projection[0][0]);
 
@@ -77,6 +80,9 @@ void Scene::render()
 
 		// Envia a textura para o uniforme no shader
 		glUniform1i(this->texture_uniform, 0);
+
+		// Envia a escala para o shader sob a uniforme de mesmo nome
+		glUniform1f(this->scale_uniform, object->scale);
 
 		// Envia o M para o shader sob a uniforme de mesmo nome
 		glUniformMatrix4fv(this->model_uniform, 1, GL_FALSE, &object->position[0][0]);

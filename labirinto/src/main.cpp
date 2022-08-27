@@ -75,8 +75,8 @@ int main(void) {
 	Model* cube_model = new Model("assets\\models\\cube", "cube.obj");
 
 	// Cria um objeto para o cubo
-	Object* cube1 = new Object(cube_model, bricks_texture, 0.0f, 0.0f, 0.0f);
-	Object* cube2 = new Object(cube_model, stone_texture, 0.0f, 0.0f, 1.0f);
+	Object* cube1 = new Object(cube_model, bricks_texture, 0.0f, 0.0f, 0.0f, 1.0f);
+	Object* cube2 = new Object(cube_model, stone_texture, -0.25f, -0.25f, 0.75f, 0.5f);
 
 	scene->objects.push_back(cube1);
 	scene->objects.push_back(cube2);
