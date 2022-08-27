@@ -65,25 +65,52 @@ int main(void) {
 	// Carrega a textura
 	Texture* texture = new Texture("assets\\textures\\cube.png");
 
-	// Obtém um handle para a uniforme no shader de fragmento responsável pela textura
-	GLuint texture_uniform = glGetUniformLocation(shader->program_id, "texture"); 
+	// Obtém um handle para a uniforme sampler no shader de fragmento responsável pela textura
+	GLuint texture_uniform = glGetUniformLocation(shader->program_id, "sampler"); 
 
 	// Lê o modelo
 	Model* cube = new Model("assets\\models", "cube.obj");
 
+	// Cria o VAO
 	GLuint vertex_array_id;
 	glGenVertexArrays(1, &vertex_array_id);
 	glBindVertexArray(vertex_array_id);
 
+	// Cria um VBO para os vértices
 	GLuint vertexbuffer;
 	glGenBuffers(1, &vertexbuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
 	glBufferData(GL_ARRAY_BUFFER, cube->vertices.size() * sizeof(glm::vec3), &cube->vertices[0], GL_STATIC_DRAW);
 
+	// Cria um VBO para as texturas (uvs)
 	GLuint uvbuffer;
 	glGenBuffers(1, &uvbuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
 	glBufferData(GL_ARRAY_BUFFER, cube->uvs.size() * sizeof(glm::vec2), &cube->uvs[0], GL_STATIC_DRAW);
+
+	// Mapeando o VBO de vértices para o VAO
+	glEnableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+	glVertexAttribPointer(
+		0,        // Posição do VBO
+		3,        // Tamanho
+		GL_FLOAT, // Tipo dos elementos
+		GL_FALSE, // Normalização
+		0,        // Stride
+		(void*)0  // Offset
+	);
+
+	// Mapeando o VBO de texturas (uvs) para o VAO
+	glEnableVertexAttribArray(1);
+	glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
+	glVertexAttribPointer(
+		1,        // Posição do VBO
+		2,        // Tamanho
+		GL_FLOAT, // Tipo dos elementos
+		GL_FALSE, // Normalização
+		0,        // Stride
+		(void*)0  // Offset
+	);
 
 	// Obtém um handle para a uniforme no shader de vértice responsável pela matriz mvp
 	GLuint mvp_uniform = glGetUniformLocation(shader->program_id, "mvp");
@@ -125,35 +152,8 @@ int main(void) {
 		// Envia a textura para o uniforme no shader
 		glUniform1i(texture_uniform, 0);
 
-		// 1rst attribute buffer : vertices
-		glEnableVertexAttribArray(0);
-		glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-		glVertexAttribPointer(
-			0,                  // attribute. No particular reason for 0, but must match the layout in the shader.
-			3,                  // size
-			GL_FLOAT,           // type
-			GL_FALSE,           // normalized?
-			0,                  // stride
-			(void*)0            // array buffer offset
-		);
-
-		// 2nd attribute buffer : UVs
-		glEnableVertexAttribArray(1);
-		glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
-		glVertexAttribPointer(
-			1,                                // attribute. No particular reason for 1, but must match the layout in the shader.
-			2,                                // size : U+V => 2
-			GL_FLOAT,                         // type
-			GL_FALSE,                         // normalized?
-			0,                                // stride
-			(void*)0                          // array buffer offset
-		);
-
 		// Desenha os vértices da cena
 		glDrawArrays(GL_TRIANGLES, 0, cube->vertices.size());
-
-		glDisableVertexAttribArray(0);
-		glDisableVertexAttribArray(1);
 
 		// Troca os buffers
 		glfwSwapBuffers(window);

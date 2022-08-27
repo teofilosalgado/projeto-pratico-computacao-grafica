@@ -7,9 +7,9 @@ in vec2 uv;
 out vec3 color;
 
 // Constante de unidade de textura
-uniform sampler2D texture;
+uniform sampler2D sampler;
 
 void main() {
 	// A saída é definida como a cor na dada posição de uv
-	color = texture(texture, uv, -2.0).rgb;
+	color = texture(sampler, uv, -2.0).rgb;
 }
