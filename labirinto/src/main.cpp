@@ -3,6 +3,7 @@
 #include "shader.h"
 #include "texture.h"
 #include "model.h"
+#include "scene.h"
 
 
 constexpr int WINDOW_WIDTH = 720;
@@ -61,109 +62,26 @@ int main(void) {
 
 	// Cria e compila os shaders
 	Shader* shader = new Shader("shaders\\default.vert", "shaders\\default.frag");
+	// Cria uma câmera para a cena
+	Camera* camera = new Camera(45.0f, WINDOW_WIDTH, WINDOW_HEIGHT);
+	// Cria uma nova cena
+	Scene* scene = new Scene(shader, camera);
 
 	// Carrega a textura
-	Texture* texture = new Texture("assets\\textures\\cube.png");
-
-	// Obtém um handle para a uniforme sampler no shader de fragmento responsável pela textura
-	GLuint texture_uniform = glGetUniformLocation(shader->program_id, "sampler"); 
-
+	Texture* cube_texture = new Texture("assets\\textures\\cube.png");
 	// Lê o modelo
-	Model* cube = new Model("assets\\models", "cube.obj");
+	Model* cube_model = new Model("assets\\models", "cube.obj");
+	// Cria um objeto para o cubo
+	Object* cube1 = new Object(cube_model, cube_texture, 0.0f, 0.0f, 0.0f);
+	Object* cube2 = new Object(cube_model, cube_texture, 0.0f, 0.0f, 1.0f);
 
-	// Cria o VAO
-	GLuint vertex_array_id;
-	glGenVertexArrays(1, &vertex_array_id);
-	glBindVertexArray(vertex_array_id);
-
-	// Cria um VBO para os vértices
-	GLuint vertex_buffer;
-	glGenBuffers(1, &vertex_buffer);
-	glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
-	glBufferData(GL_ARRAY_BUFFER, cube->vertices.size() * sizeof(glm::vec3), nullptr, GL_DYNAMIC_DRAW);
-
-	// Cria um VBO para as texturas (uvs)
-	GLuint uv_buffer;
-	glGenBuffers(1, &uv_buffer);
-	glBindBuffer(GL_ARRAY_BUFFER, uv_buffer);
-	glBufferData(GL_ARRAY_BUFFER, cube->uvs.size() * sizeof(glm::vec2), nullptr, GL_DYNAMIC_DRAW);
-
-	// Mapeando o VBO de vértices para o VAO
-	glEnableVertexAttribArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
-	glVertexAttribPointer(
-		0,        // Posição do VBO
-		3,        // Tamanho
-		GL_FLOAT, // Tipo dos elementos
-		GL_FALSE, // Normalização
-		0,        // Stride
-		(void*)0  // Offset
-	);
-
-	// Mapeando o VBO de texturas (uvs) para o VAO
-	glEnableVertexAttribArray(1);
-	glBindBuffer(GL_ARRAY_BUFFER, uv_buffer);
-	glVertexAttribPointer(
-		1,        // Posição do VBO
-		2,        // Tamanho
-		GL_FLOAT, // Tipo dos elementos
-		GL_FALSE, // Normalização
-		0,        // Stride
-		(void*)0  // Offset
-	);
-
-	// Obtém um handle para cada uniforme no shader de vértice responsável pela matriz mvp
-	GLuint model_uniform = glGetUniformLocation(shader->program_id, "model");
-	GLuint view_uniform = glGetUniformLocation(shader->program_id, "view");
-	GLuint projection_uniform = glGetUniformLocation(shader->program_id, "projection");
-
-	// Matrix de projeção 
-	//   Campode visão: 45° 
-	//   Aspecto: WINDOW_WIDTH/WINDOW_HEIGHT
-	//   Intervalo de exibição: 0.1 <-> 100
-	glm::mat4 projection = glm::perspective(glm::radians(45.0f), static_cast<float>(WINDOW_WIDTH) / static_cast<float>(WINDOW_HEIGHT), 0.1f, 1000.0f);
-
-	// Matrix da câmera (visão)
-	glm::mat4 view = glm::lookAt(
-		glm::vec3(3, 3, 3),   // câmera se encontra em (3, 3, 3) no espaço
-		glm::vec3(0, 0, 0),   // olhando para a origem
-		glm::vec3(0, 1, 0)    // na orientação correta (cabeça pra cima)
-	);
-	
-	// Matrix do modelo na origem
-	glm::mat4 model_b = glm::mat4(1.0f);
-	glm::mat4 model = glm::translate(model_b, glm::vec3(1.0f, 0.0f, 0.0f));
+	scene->objects.push_back(cube1);
+	scene->objects.push_back(cube2);
 
 	// Enquanto o usuário não fechar a janela:
 	while (!glfwWindowShouldClose(window)) {
-		// Limpa a tela
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		// Habilita o shader
-		glUseProgram(shader->program_id);
-
-		// Envia a mvp para o shader sob a uniforme de mesmo nome
-		glUniformMatrix4fv(model_uniform, 1, GL_FALSE, &model[0][0]);
-		glUniformMatrix4fv(view_uniform, 1, GL_FALSE, &view[0][0]);
-		glUniformMatrix4fv(projection_uniform, 1, GL_FALSE, &projection[0][0]);
-
-		// Vincula a textura na unidade de textura 0
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, texture->texture_id);
-
-		// Envia a textura para o uniforme no shader
-		glUniform1i(texture_uniform, 0);
-
-		// Carrega os vértices dos modelos no buffer dedicado
-		glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
-		glBufferSubData(GL_ARRAY_BUFFER, 0, cube->vertices.size() * sizeof(glm::vec3), cube->vertices.data());
-
-		// Carrega as texturas (uvs) dos modelos no buffer dedicado
-		glBindBuffer(GL_ARRAY_BUFFER, uv_buffer);
-		glBufferSubData(GL_ARRAY_BUFFER, 0, cube->uvs.size() * sizeof(glm::vec2), cube->uvs.data());
-
-		// Desenha os vértices da cena
-		glDrawArrays(GL_TRIANGLES, 0, cube->vertices.size());
+		scene->render();
 
 		// Troca os buffers
 		glfwSwapBuffers(window);

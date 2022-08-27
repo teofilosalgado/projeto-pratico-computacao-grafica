@@ -7,8 +7,8 @@ class Scene
 {
 public:
 	Scene(Shader* shader, Camera* camera);
-	void add_object(Object* object);
-private:
+	void render();
+
 	Shader* shader;
 	Camera* camera;
 	std::vector<Object*> objects;
@@ -18,5 +18,8 @@ private:
 	GLuint projection_uniform;
 
 	GLuint texture_uniform;
+
+	GLuint vertex_buffer;
+	GLuint uv_buffer;
 };
 

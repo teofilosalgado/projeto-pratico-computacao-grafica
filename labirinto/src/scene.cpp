@@ -23,13 +23,11 @@ Scene::Scene(Shader* shader, Camera* camera)
 	glBindVertexArray(vertex_array_id);
 
 	// Cria um VBO para os vértices
-	GLuint vertex_buffer;
 	glGenBuffers(1, &vertex_buffer);
 	glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
 	glBufferData(GL_ARRAY_BUFFER, BUFFER_SIZE, nullptr, GL_DYNAMIC_DRAW);
 
 	// Cria um VBO para as texturas (uvs)
-	GLuint uv_buffer;
 	glGenBuffers(1, &uv_buffer);
 	glBindBuffer(GL_ARRAY_BUFFER, uv_buffer);
 	glBufferData(GL_ARRAY_BUFFER, BUFFER_SIZE, nullptr, GL_DYNAMIC_DRAW);
@@ -59,7 +57,39 @@ Scene::Scene(Shader* shader, Camera* camera)
 	);
 }
 
-void Scene::add_object(Object* object)
+void Scene::render()
 {
-	this->objects.push_back(object);
+	// Limpa a tela
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	// Habilita o shader
+	glUseProgram(this->shader->program_id);
+
+	// Envia a VP para o shader sob a uniforme de mesmo nome
+	glUniformMatrix4fv(this->view_uniform, 1, GL_FALSE, &this->camera->view[0][0]);
+	glUniformMatrix4fv(this->projection_uniform, 1, GL_FALSE, &this->camera->projection[0][0]);
+
+	for (Object* object : this->objects)
+	{
+		// Vincula a textura na unidade de textura 0
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, object->texture->texture_id);
+
+		// Envia a textura para o uniforme no shader
+		glUniform1i(this->texture_uniform, 0);
+
+		// Envia o M para o shader sob a uniforme de mesmo nome
+		glUniformMatrix4fv(this->model_uniform, 1, GL_FALSE, &object->position[0][0]);
+
+		// Carrega os vértices dos modelos no buffer dedicado
+		glBindBuffer(GL_ARRAY_BUFFER, this->vertex_buffer);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, object->model->vertices.size() * sizeof(glm::vec3), object->model->vertices.data());
+
+		// Carrega as texturas (uvs) dos modelos no buffer dedicado
+		glBindBuffer(GL_ARRAY_BUFFER, this->uv_buffer);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, object->model->uvs.size() * sizeof(glm::vec2), object->model->uvs.data());
+
+		// Desenha os vértices da cena
+		glDrawArrays(GL_TRIANGLES, 0, object->model->vertices.size());
+	}
 }
