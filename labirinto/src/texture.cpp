@@ -1,9 +1,6 @@
-#include "texture.h"
-
 #define STB_IMAGE_IMPLEMENTATION
 #define STBI_ONLY_PNG
-#include "stb_image.h"
-#include <iostream>
+#include "texture.h"
 
 Texture::Texture(const char* texture_file_path)
 {

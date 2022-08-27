@@ -112,8 +112,10 @@ int main(void) {
 		(void*)0  // Offset
 	);
 
-	// Obtém um handle para a uniforme no shader de vértice responsável pela matriz mvp
-	GLuint mvp_uniform = glGetUniformLocation(shader->program_id, "mvp");
+	// Obtém um handle para cada uniforme no shader de vértice responsável pela matriz mvp
+	GLuint model_uniform = glGetUniformLocation(shader->program_id, "model");
+	GLuint view_uniform = glGetUniformLocation(shader->program_id, "view");
+	GLuint projection_uniform = glGetUniformLocation(shader->program_id, "projection");
 
 	// Matrix de projeção 
 	//   Campode visão: 45° 
@@ -129,10 +131,8 @@ int main(void) {
 	);
 	
 	// Matrix do modelo na origem
-	glm::mat4 model = glm::mat4(1.0f);
-
-	// Monta a matrix de projeção
-	glm::mat4 mvp = projection * view * model;
+	glm::mat4 model_b = glm::mat4(1.0f);
+	glm::mat4 model = glm::translate(model_b, glm::vec3(1.0f, 0.0f, 0.0f));
 
 	// Enquanto o usuário não fechar a janela:
 	while (!glfwWindowShouldClose(window)) {
@@ -143,7 +143,9 @@ int main(void) {
 		glUseProgram(shader->program_id);
 
 		// Envia a mvp para o shader sob a uniforme de mesmo nome
-		glUniformMatrix4fv(mvp_uniform, 1, GL_FALSE, &mvp[0][0]);
+		glUniformMatrix4fv(model_uniform, 1, GL_FALSE, &model[0][0]);
+		glUniformMatrix4fv(view_uniform, 1, GL_FALSE, &view[0][0]);
+		glUniformMatrix4fv(projection_uniform, 1, GL_FALSE, &projection[0][0]);
 
 		// Vincula a textura na unidade de textura 0
 		glActiveTexture(GL_TEXTURE0);

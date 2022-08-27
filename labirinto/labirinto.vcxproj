@@ -133,12 +133,18 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\camera.cpp" />
+    <ClCompile Include="src\object.cpp" />
+    <ClCompile Include="src\scene.cpp" />
     <ClCompile Include="src\model.cpp" />
     <ClCompile Include="src\shader.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\texture.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\camera.h" />
+    <ClInclude Include="src\object.h" />
+    <ClInclude Include="src\scene.h" />
     <ClInclude Include="src\controls.cpp" />
     <ClInclude Include="src\controls.h" />
     <ClInclude Include="src\model.h" />

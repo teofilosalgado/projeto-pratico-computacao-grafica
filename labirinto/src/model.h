@@ -14,7 +14,7 @@
 class Model
 {
 public:
-	Model(const std::string& objPath, const std::string& objFilename);
+	Model(const std::string& model_path, const std::string& model_file_name);
 	std::vector<glm::vec3> vertices;
 	std::vector<glm::vec2> uvs;
 	std::vector<glm::vec3> normals;
