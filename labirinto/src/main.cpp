@@ -68,19 +68,22 @@ int main(void) {
 	Scene* scene = new Scene(shader, camera);
 
 	// Carrega a textura
-	Texture* cube_texture = new Texture("assets\\textures\\cube.png");
+	Texture* bricks_texture = new Texture("assets\\textures\\bricks.png");
+	Texture* stone_texture = new Texture("assets\\textures\\stone.png");
+
 	// Lê o modelo
-	Model* cube_model = new Model("assets\\models", "cube.obj");
+	Model* cube_model = new Model("assets\\models\\cube", "cube.obj");
+
 	// Cria um objeto para o cubo
-	Object* cube1 = new Object(cube_model, cube_texture, 0.0f, 0.0f, 0.0f);
-	Object* cube2 = new Object(cube_model, cube_texture, 0.0f, 0.0f, 1.0f);
+	Object* cube1 = new Object(cube_model, bricks_texture, 0.0f, 0.0f, 0.0f);
+	Object* cube2 = new Object(cube_model, stone_texture, 0.0f, 0.0f, 1.0f);
 
 	scene->objects.push_back(cube1);
 	scene->objects.push_back(cube2);
 
 	// Enquanto o usuário não fechar a janela:
 	while (!glfwWindowShouldClose(window)) {
-
+		// Renderiza a cena
 		scene->render();
 
 		// Troca os buffers
