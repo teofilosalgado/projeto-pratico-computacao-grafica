@@ -1,9 +1,22 @@
 #include "object.h"
 
-Object::Object(Model* model, Texture* texture, float x, float y, float z, float scale)
+Object::Object(Model* model, Texture* texture, glm::vec3 coordinates, float scale)
 {
 	this->model = model;
 	this->texture = texture;
-	this->position = glm::translate(glm::mat4(1.0f), glm::vec3(x, y, z));
 	this->scale = scale;
+	this->coordinates = coordinates;
+	this->position = glm::translate(glm::mat4(1.0f), this->coordinates);
+}
+
+void Object::move_to(glm::vec3 coordinates)
+{
+	this->coordinates = coordinates;
+	this->position = glm::translate(glm::mat4(1.0f), this->coordinates);
+}
+
+void Object::move(glm::vec3 delta_coordinates)
+{
+	this->coordinates += delta_coordinates;
+	this->position = glm::translate(glm::mat4(1.0f), this->coordinates);
 }

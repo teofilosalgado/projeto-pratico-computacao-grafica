@@ -104,7 +104,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;GLEW_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)dependencies\glew-2.1.0\include;$(SolutionDir)dependencies\glfw-3.3.8\include;$(SolutionDir)vendor\src\glm;$(SolutionDir)vendor\src\stb;$(SolutionDir)vendor\src\tinyobjloader;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)vendor\src\imgui;$(SolutionDir)dependencies\glew-2.1.0\include;$(SolutionDir)dependencies\glfw-3.3.8\include;$(SolutionDir)vendor\src\glm;$(SolutionDir)vendor\src\stb;$(SolutionDir)vendor\src\tinyobjloader;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -121,7 +121,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;GLEW_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)dependencies\glew-2.1.0\include;$(SolutionDir)dependencies\glfw-3.3.8\include;$(SolutionDir)vendor\src\glm;$(SolutionDir)vendor\src\stb;$(SolutionDir)vendor\src\tinyobjloader;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)vendor\src\imgui;$(SolutionDir)dependencies\glew-2.1.0\include;$(SolutionDir)dependencies\glfw-3.3.8\include;$(SolutionDir)vendor\src\glm;$(SolutionDir)vendor\src\stb;$(SolutionDir)vendor\src\tinyobjloader;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -133,6 +133,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\vendor\src\imgui\backends\imgui_impl_glfw.cpp" />
+    <ClCompile Include="..\vendor\src\imgui\backends\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="..\vendor\src\imgui\imgui.cpp" />
+    <ClCompile Include="..\vendor\src\imgui\imgui_draw.cpp" />
+    <ClCompile Include="..\vendor\src\imgui\imgui_tables.cpp" />
+    <ClCompile Include="..\vendor\src\imgui\imgui_widgets.cpp" />
     <ClCompile Include="src\camera.cpp" />
     <ClCompile Include="src\object.cpp" />
     <ClCompile Include="src\scene.cpp" />
@@ -142,6 +148,13 @@
     <ClCompile Include="src\texture.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\vendor\src\imgui\backends\imgui_impl_glfw.h" />
+    <ClInclude Include="..\vendor\src\imgui\backends\imgui_impl_opengl3.h" />
+    <ClInclude Include="..\vendor\src\imgui\imgui.h" />
+    <ClInclude Include="..\vendor\src\imgui\imgui_internal.h" />
+    <ClInclude Include="..\vendor\src\imgui\imstb_rectpack.h" />
+    <ClInclude Include="..\vendor\src\imgui\imstb_textedit.h" />
+    <ClInclude Include="..\vendor\src\imgui\imstb_truetype.h" />
     <ClInclude Include="src\camera.h" />
     <ClInclude Include="src\object.h" />
     <ClInclude Include="src\scene.h" />
