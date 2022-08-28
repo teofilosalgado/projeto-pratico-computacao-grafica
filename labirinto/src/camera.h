@@ -13,9 +13,16 @@ public:
 	void move_eye(glm::vec3 delta_eye);
 	void move_center(glm::vec3 delta_center);
 
+	float mouse_sensitivity;
+	float jaw;
+	float pitch;
+
 	glm::mat4 projection;
 	glm::mat4 view;
-	glm::vec3 eye;
-	glm::vec3 center;
+
+	glm::vec3 eye;    // position
+	glm::vec3 center; // front
+	glm::vec3 up;
+	glm::vec3 right;
 };
 

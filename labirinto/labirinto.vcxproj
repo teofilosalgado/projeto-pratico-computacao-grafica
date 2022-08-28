@@ -140,12 +140,14 @@
     <ClCompile Include="..\vendor\src\imgui\imgui_tables.cpp" />
     <ClCompile Include="..\vendor\src\imgui\imgui_widgets.cpp" />
     <ClCompile Include="src\camera.cpp" />
+    <ClCompile Include="src\level.cpp" />
     <ClCompile Include="src\object.cpp" />
     <ClCompile Include="src\scene.cpp" />
     <ClCompile Include="src\model.cpp" />
     <ClCompile Include="src\shader.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\texture.cpp" />
+    <ClCompile Include="src\window.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\vendor\src\imgui\backends\imgui_impl_glfw.h" />
@@ -156,13 +158,13 @@
     <ClInclude Include="..\vendor\src\imgui\imstb_textedit.h" />
     <ClInclude Include="..\vendor\src\imgui\imstb_truetype.h" />
     <ClInclude Include="src\camera.h" />
+    <ClInclude Include="src\level.h" />
     <ClInclude Include="src\object.h" />
     <ClInclude Include="src\scene.h" />
-    <ClInclude Include="src\controls.cpp" />
-    <ClInclude Include="src\controls.h" />
     <ClInclude Include="src\model.h" />
     <ClInclude Include="src\shader.h" />
     <ClInclude Include="src\texture.h" />
+    <ClInclude Include="src\window.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

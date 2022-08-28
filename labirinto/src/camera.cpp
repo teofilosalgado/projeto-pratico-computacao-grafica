@@ -5,12 +5,19 @@ Camera::Camera(float field_of_view, int window_width, int window_height, glm::ve
 	// Inicializa as variáveis
 	this->eye = eye;
 	this->center = center;
+
+	this->mouse_sensitivity = 0.25;
+	this->jaw = -90.0;
+	this->pitch = 0.0;
+
+	this->up = glm::vec3(0.0, 1.0, 0.0);
+	this->right = glm::vec3(1.0, 0.0, 0.0);
 	
 	// Matrix de projeção 
 	//   Campo de visão: 45° 
 	//   Aspecto: WINDOW_WIDTH/WINDOW_HEIGHT
 	//   Intervalo de exibição: 0.1 <-> 100
-	this->projection = glm::perspective(glm::radians(field_of_view), static_cast<float>(window_width) / static_cast<float>(window_height), 0.1f, 1000.0f);
+	this->projection = glm::perspective(glm::radians(field_of_view), static_cast<float>(window_width) / static_cast<float>(window_height), 0.1f, 100.0f);
 
 	// Matrix da câmera (visão)
 	this->view = glm::lookAt(
