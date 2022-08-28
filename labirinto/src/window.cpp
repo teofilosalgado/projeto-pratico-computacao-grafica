@@ -13,7 +13,7 @@ static std::map<const char*, const char*> controls = {
 
 // Limite de FPS
 constexpr float LIMITE_FPS = 60.0f;
-static double ultimo_tempo = glfwGetTime();
+
 
 static void key_callback(GLFWwindow* window, int key, int scan_code, int action, int modifiers) {
 	Window* handler = reinterpret_cast<Window*>(glfwGetWindowUserPointer(window));
@@ -23,17 +23,17 @@ static void key_callback(GLFWwindow* window, int key, int scan_code, int action,
 	if (key == GLFW_KEY_P && action == GLFW_PRESS) {
 		handler->pause();
 	}
-	if (key == GLFW_KEY_W && action == GLFW_REPEAT) {
-		handler->camera->move_eye(FORWARD);
+	if (key == GLFW_KEY_W && action != GLFW_RELEASE) {
+		handler->camera->move_eye(FORWARD, handler->delta);
 	}
-	if (key == GLFW_KEY_A && action == GLFW_REPEAT) {
-		handler->camera->move_eye(LEFT);
+	if (key == GLFW_KEY_A && action != GLFW_RELEASE) {
+		handler->camera->move_eye(LEFT, handler->delta);
 	}
-	if (key == GLFW_KEY_S && action == GLFW_REPEAT) {
-		handler->camera->move_eye(BACKWARD);
+	if (key == GLFW_KEY_S && action != GLFW_RELEASE) {
+		handler->camera->move_eye(BACKWARD, handler->delta);
 	}
-	if (key == GLFW_KEY_D && action == GLFW_REPEAT) {
-		handler->camera->move_eye(RIGHT);
+	if (key == GLFW_KEY_D && action != GLFW_RELEASE) {
+		handler->camera->move_eye(RIGHT, handler->delta);
 	}
 }
 
@@ -55,7 +55,7 @@ static void cursor_pos_callback(GLFWwindow* window, double x_position, double y_
 	handler->last_cursor_x_position = x_position;
 	handler->last_cursor_y_position = y_position;
 
-	handler->camera->move_center(x_offset, y_offset);
+	handler->camera->move_center(x_offset, y_offset, handler->delta);
 }
 
 Window::Window(float width, float height, const char* title) {
@@ -67,6 +67,8 @@ Window::Window(float width, float height, const char* title) {
 	this->last_cursor_y_position = height / 2;
 	this->first_mouse = true;
 	this->is_paused = true;
+	this->last_time = 0;
+	this->delta = 0;
 
 	// Inicializa a biblioteca GLFW
 	glfwInit();
@@ -123,7 +125,7 @@ Window::Window(float width, float height, const char* title) {
 	ImGui_ImplOpenGL3_Init("#version 460");
 
 	// Cria uma câmera para as cenas
-	this->camera = new Camera(45.0f, this->width, this->height, 0.25, 0.05, glm::vec3(1.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+	this->camera = new Camera(45.0f, this->width, this->height, 5.0, 5.0, glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
 }
 
 Window::~Window() {
@@ -147,14 +149,14 @@ void Window::run() {
 
 	while (!glfwWindowShouldClose(window)) {
 		// Limita o FPS das cenas
-		double tempo_atual = glfwGetTime();
-		double delta = tempo_atual - ultimo_tempo;
-		if (delta <= (1.0 / LIMITE_FPS)) {
+		double current_time = glfwGetTime();
+		this->delta = current_time - this->last_time;
+		if (this->delta <= (1.0 / LIMITE_FPS)) {
 			continue;
 		}
 
 		// Atualiza o contador de tempo
-		ultimo_tempo = tempo_atual;
+		this->last_time = current_time;
 
 		// Renderiza as cenas
 		level->run(this->is_paused);
@@ -167,7 +169,7 @@ void Window::run() {
 		if (this->is_paused) {
 			ImGui::Begin(this->title);
 			ImGui::Text("Bem vindo ao jogo Labirinto!");
-			ImGui::Text("FPS: %f", 1.0/delta);
+			ImGui::Text("FPS: %.2f", 1.0/this->delta);
 			ImGui::Text("Controles:");
 			if (ImGui::BeginTable("controls", 2)) {
 				for (std::pair<const char*, const char*> const& control : controls)

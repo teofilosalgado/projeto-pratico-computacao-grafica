@@ -27,6 +27,10 @@ public:
 	float last_cursor_y_position;
 	bool first_mouse;
 
+	// Controle de FPS
+	double last_time;
+	double delta;
+
 private:
 	float width;
 	float height;

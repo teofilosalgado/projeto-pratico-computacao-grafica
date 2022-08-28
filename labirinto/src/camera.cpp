@@ -26,6 +26,11 @@ void Camera::set_view_matrix() {
 	this->right = glm::normalize(glm::cross(this->center, glm::vec3(0.0, 1.0, 0.0)));
 	this->up = glm::normalize(glm::cross(this->right, this->center));
 
+	// Limita altura da câmera
+	if (this->eye.y > 1.0f) {
+		this->eye.y = 1.0f;
+	}
+
 	// Matrix da câmera (visão)
 	this->view = glm::lookAt(
 		this->eye,   // câmera se encontra em (x, y, z) no espaço
@@ -34,11 +39,11 @@ void Camera::set_view_matrix() {
 	);
 }
 
-void Camera::move_center(float x_offset, float y_offset)
+void Camera::move_center(float x_offset, float y_offset, double delta)
 {
 	// Calcula os ângulos de rotação vertical e horizontal (pitch e jaw)
-	float local_x_offset = x_offset * this->mouse_sensitivity;
-	float local_y_offset = y_offset * this->mouse_sensitivity;
+	float local_x_offset = x_offset * delta * this->mouse_sensitivity;
+	float local_y_offset = y_offset * delta * this->mouse_sensitivity;
 	
 	this->jaw += local_x_offset;
 	this->pitch += local_y_offset;
@@ -60,21 +65,21 @@ void Camera::move_center(float x_offset, float y_offset)
 	set_view_matrix();
 }
 
-void Camera::move_eye(Direction direction)
+void Camera::move_eye(Direction direction, double delta)
 {
 	switch (direction)
 	{
 	case FORWARD:
-		this->eye += this->center * keyboard_sensitivity;
+		this->eye += this->center * (static_cast<float>(delta) * keyboard_sensitivity);
 		break;
 	case LEFT:
-		this->eye -= this->right * keyboard_sensitivity;
+		this->eye -= this->right * (static_cast<float>(delta) * keyboard_sensitivity);
 		break;
 	case BACKWARD:
-		this->eye -= this->center * keyboard_sensitivity;
+		this->eye -= this->center * (static_cast<float>(delta) * keyboard_sensitivity);
 		break;
 	case RIGHT:
-		this->eye += this->right * keyboard_sensitivity;
+		this->eye += this->right * (static_cast<float>(delta) * keyboard_sensitivity);
 		break;
 	default:
 		break;
