@@ -6,8 +6,7 @@ Level::Level(Camera* camera)
 	Shader* shader = new Shader("shaders\\default.vert", "shaders\\default.frag");
 
 	// Cria uma nova cena
-	Scene* scene = new Scene(shader, camera);
-	this->scene = scene;
+	this->scene = new Scene(shader, camera);
 
 	// Carrega a textura
 	Texture* bricks_texture = new Texture("assets\\textures\\bricks.png");

@@ -10,6 +10,20 @@ static void key_callback(GLFWwindow* window, int key, int scan_code, int action,
 static void cursor_pos_callback(GLFWwindow* window, double x_position, double y_position)
 {
 	Window* handler = reinterpret_cast<Window*>(glfwGetWindowUserPointer(window));
+
+	if (handler->first_mouse) {
+		handler->last_cursor_x_position = x_position;
+		handler->last_cursor_y_position = y_position;
+		handler->first_mouse = false;
+	}
+
+	float x_offset = x_position - handler->last_cursor_x_position;
+	float y_offset = handler->last_cursor_y_position - y_position;
+
+	handler->last_cursor_x_position = x_position;
+	handler->last_cursor_y_position = y_position;
+
+	handler->camera->move(x_offset, y_offset);
 }
 
 Window::Window(float width, float height, const char* title)
@@ -18,6 +32,9 @@ Window::Window(float width, float height, const char* title)
 	this->width = width;
 	this->height = height;
 	this->title = title;
+	this->last_cursor_x_position = width / 2;
+	this->last_cursor_y_position = height / 2;
+	this->first_mouse = true;
 
 	// Inicializa a biblioteca GLFW
 	glfwInit();
@@ -75,6 +92,9 @@ Window::Window(float width, float height, const char* title)
 	ImGui::StyleColorsDark();
 	ImGui_ImplGlfw_InitForOpenGL(this->window, true);
 	ImGui_ImplOpenGL3_Init("#version 460");
+
+	// Cria uma câmera para as cenas
+	this->camera = new Camera(45.0f, this->width, this->height, glm::vec3(1.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
 }
 
 Window::~Window()
@@ -85,9 +105,6 @@ Window::~Window()
 
 void Window::run()
 {
-	// Cria uma câmera para as cenas
-	Camera* camera = new Camera(45.0f, this->width, this->height, glm::vec3(1.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
-
 	// Nível do jogo
 	Level* level = new Level(camera);
 

@@ -17,6 +17,12 @@ public:
 	void run();
 	GLFWwindow* window;
 
+	// Controles para a câmera
+	Camera* camera;
+	float last_cursor_x_position;
+	float last_cursor_y_position;
+	bool first_mouse;
+
 private:
 	float width;
 	float height;

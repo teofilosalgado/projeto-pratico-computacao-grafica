@@ -23,46 +23,40 @@ Camera::Camera(float field_of_view, int window_width, int window_height, glm::ve
 	this->view = glm::lookAt(
 		this->eye,   // câmera se encontra em (x, y, z) no espaço
 		this->center,   // olhando para o centro
-		glm::vec3(0, 1, 0)    // na orientação correta (cabeça pra cima)
+		this->up   // na orientação correta (cabeça pra cima)
 	);
 }
 
-void Camera::move_eye_to(glm::vec3 eye)
+void Camera::move(float x_offset, float y_offset)
 {
-	this->eye = eye;
-	this->view = glm::lookAt(
-		this->eye,  
-		this->center,
-		glm::vec3(0, 1, 0)
-	);
-}
+	// Calcula os ângulos de rotação vertical e horizontal (pitch e jaw)
+	float local_x_offset = x_offset * this->mouse_sensitivity;
+	float local_y_offset = y_offset * this->mouse_sensitivity;
+	
+	this->jaw += local_x_offset;
+	this->pitch += local_y_offset;
 
-void Camera::move_center_to(glm::vec3 center)
-{
-	this->center = center;
-	this->view = glm::lookAt(
-		this->eye,
-		this->center,
-		glm::vec3(0, 1, 0)
-	);
-}
+	if (this->pitch > 45) {
+		this->pitch = 45;
+	}
+	if (this->pitch < -45) {
+		this->pitch = -45;
+	}
 
-void Camera::move_eye(glm::vec3 delta_eye)
-{
-	this->eye += delta_eye;
-	this->view = glm::lookAt(
-		this->eye,
-		this->center,
-		glm::vec3(0, 1, 0)
-	);
-}
+	// Atualiza os vetores da câmera
+	glm::vec3 local_center = glm::vec3(0.0, 0.0, 0.0);
+	local_center.x = glm::cos(glm::radians(this->jaw)) * glm::cos(glm::radians(this->pitch));
+	local_center.y = glm::sin(glm::radians(this->pitch));
+	local_center.z = glm::sin(glm::radians(this->jaw)) * glm::cos(glm::radians(this->pitch));
 
-void Camera::move_center(glm::vec3 delta_center)
-{
-	this->center += delta_center;
+	this->center = glm::normalize(local_center);
+	this->right = glm::normalize(glm::cross(this->center, glm::vec3(0.0, 1.0, 0.0)));
+	this->up = glm::normalize(glm::cross(this->right, this->center));
+
+	// Matrix da câmera (visão)
 	this->view = glm::lookAt(
 		this->eye,
-		this->center,
-		glm::vec3(0, 1, 0)
+		this->eye + this->center,
+		this->up
 	);
 }

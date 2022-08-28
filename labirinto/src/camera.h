@@ -7,11 +7,7 @@ class Camera
 {
 public:
 	Camera(float field_of_view, int window_width, int window_height, glm::vec3 eye, glm::vec3 center);
-	void move_eye_to(glm::vec3 eye);
-	void move_center_to(glm::vec3 center);
-
-	void move_eye(glm::vec3 delta_eye);
-	void move_center(glm::vec3 delta_center);
+	void move(float x_offset, float y_offset);
 
 	float mouse_sensitivity;
 	float jaw;
