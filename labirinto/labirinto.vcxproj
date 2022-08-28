@@ -158,6 +158,7 @@
     <ClInclude Include="..\vendor\src\imgui\imstb_textedit.h" />
     <ClInclude Include="..\vendor\src\imgui\imstb_truetype.h" />
     <ClInclude Include="src\camera.h" />
+    <ClInclude Include="src\direction.h" />
     <ClInclude Include="src\level.h" />
     <ClInclude Include="src\object.h" />
     <ClInclude Include="src\scene.h" />

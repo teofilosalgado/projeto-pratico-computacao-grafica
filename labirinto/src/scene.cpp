@@ -60,7 +60,7 @@ Scene::Scene(Shader* shader, Camera* camera)
 	);
 }
 
-void Scene::render()
+void Scene::render(bool is_paused)
 {
 	// Limpa a tela
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -98,4 +98,11 @@ void Scene::render()
 		// Desenha os vértices da cena
 		glDrawArrays(GL_TRIANGLES, 0, object->model->vertices.size());
 	}
+
+	// Congela a cena se estiver pausada, impedindo animações
+	if (is_paused) {
+		return;
+	}
+
+	// Animações dos objetos
 }

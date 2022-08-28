@@ -7,7 +7,7 @@ class Scene
 {
 public:
 	Scene(Shader* shader, Camera* camera);
-	void render();
+	void render(bool is_paused);
 
 	Shader* shader;
 	Camera* camera;

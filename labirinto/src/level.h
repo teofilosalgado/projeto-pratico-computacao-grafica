@@ -10,7 +10,7 @@ class Level
 {
 public:
 	Level(Camera* camera);
-	void run();
+	void run(bool is_paused);
 private:
 	Scene* scene;
 };

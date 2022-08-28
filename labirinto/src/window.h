@@ -1,4 +1,6 @@
 #pragma once
+#include <map>
+
 #include <GL/glew.h> 
 #include <GLFW/glfw3.h>
 
@@ -16,6 +18,8 @@ public:
 	~Window();
 	void run();
 	GLFWwindow* window;
+	void pause();
+	bool is_paused;
 
 	// Controles para a câmera
 	Camera* camera;

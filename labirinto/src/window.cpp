@@ -1,15 +1,47 @@
 #include "window.h"
 
-static void key_callback(GLFWwindow* window, int key, int scan_code, int action, int modifiers)
-{
+// Lista de controles do jogo
+static std::map<const char*, const char*> controls = {
+	{"P", "Pausar"},
+	{"Esc", "Sair"},
+	{"W", "Andar pra frente"},
+	{"S", "Andar pra trás"},
+	{"A", "Andar pra esquerda"},
+	{"D", "Andar pra direita"},
+	{"Mouse", "Câmera"},
+};
+
+// Limite de FPS
+constexpr float LIMITE_FPS = 60.0f;
+static double ultimo_tempo = glfwGetTime();
+
+static void key_callback(GLFWwindow* window, int key, int scan_code, int action, int modifiers) {
 	Window* handler = reinterpret_cast<Window*>(glfwGetWindowUserPointer(window));
-	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
 		glfwSetWindowShouldClose(handler->window, true);
+	}
+	if (key == GLFW_KEY_P && action == GLFW_PRESS) {
+		handler->pause();
+	}
+	if (key == GLFW_KEY_W && action == GLFW_REPEAT) {
+		handler->camera->move_eye(FORWARD);
+	}
+	if (key == GLFW_KEY_A && action == GLFW_REPEAT) {
+		handler->camera->move_eye(LEFT);
+	}
+	if (key == GLFW_KEY_S && action == GLFW_REPEAT) {
+		handler->camera->move_eye(BACKWARD);
+	}
+	if (key == GLFW_KEY_D && action == GLFW_REPEAT) {
+		handler->camera->move_eye(RIGHT);
+	}
 }
 
-static void cursor_pos_callback(GLFWwindow* window, double x_position, double y_position)
-{
+static void cursor_pos_callback(GLFWwindow* window, double x_position, double y_position) {
 	Window* handler = reinterpret_cast<Window*>(glfwGetWindowUserPointer(window));
+	if (handler->is_paused) {
+		return;
+	}
 
 	if (handler->first_mouse) {
 		handler->last_cursor_x_position = x_position;
@@ -23,11 +55,10 @@ static void cursor_pos_callback(GLFWwindow* window, double x_position, double y_
 	handler->last_cursor_x_position = x_position;
 	handler->last_cursor_y_position = y_position;
 
-	handler->camera->move(x_offset, y_offset);
+	handler->camera->move_center(x_offset, y_offset);
 }
 
-Window::Window(float width, float height, const char* title)
-{
+Window::Window(float width, float height, const char* title) {
 	// Inicializa os campos
 	this->width = width;
 	this->height = height;
@@ -35,6 +66,7 @@ Window::Window(float width, float height, const char* title)
 	this->last_cursor_x_position = width / 2;
 	this->last_cursor_y_position = height / 2;
 	this->first_mouse = true;
+	this->is_paused = true;
 
 	// Inicializa a biblioteca GLFW
 	glfwInit();
@@ -62,11 +94,8 @@ Window::Window(float width, float height, const char* title)
 		glfwTerminate();
 	}
 
-	// Define o método de leitura das teclas
-	glfwSetInputMode(this->window, GLFW_STICKY_KEYS, GL_TRUE);
-
 	// Esconde o cursor do mouse e libera o movimento completo
-	glfwSetInputMode(this->window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	glfwSetInputMode(this->window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 
 	// Define a cor de fundo como preto
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
@@ -94,33 +123,68 @@ Window::Window(float width, float height, const char* title)
 	ImGui_ImplOpenGL3_Init("#version 460");
 
 	// Cria uma câmera para as cenas
-	this->camera = new Camera(45.0f, this->width, this->height, glm::vec3(1.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+	this->camera = new Camera(45.0f, this->width, this->height, 0.25, 0.05, glm::vec3(1.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
 }
 
-Window::~Window()
-{
+Window::~Window() {
 	glfwDestroyWindow(this->window);
 	glfwTerminate();
 }
 
-void Window::run()
-{
+void Window::pause() {
+	if (this->is_paused) {
+		glfwSetInputMode(this->window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	}
+	else {
+		glfwSetInputMode(this->window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+	}
+	this->is_paused = !this->is_paused;
+}
+
+void Window::run() {
 	// Nível do jogo
 	Level* level = new Level(camera);
 
 	while (!glfwWindowShouldClose(window)) {
-		// Renderiza a cena
-		level->run();
+		// Limita o FPS das cenas
+		double tempo_atual = glfwGetTime();
+		double delta = tempo_atual - ultimo_tempo;
+		if (delta <= (1.0 / LIMITE_FPS)) {
+			continue;
+		}
+
+		// Atualiza o contador de tempo
+		ultimo_tempo = tempo_atual;
+
+		// Renderiza as cenas
+		level->run(this->is_paused);
 
 		// Inicializa a janela do ImGui
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
 
-		ImGui::Begin(this->title);
-		// Renderiza os widgets da cena
-
-		ImGui::End();
+		if (this->is_paused) {
+			ImGui::Begin(this->title);
+			ImGui::Text("Bem vindo ao jogo Labirinto!");
+			ImGui::Text("FPS: %f", 1.0/delta);
+			ImGui::Text("Controles:");
+			if (ImGui::BeginTable("controls", 2)) {
+				for (std::pair<const char*, const char*> const& control : controls)
+				{
+					ImGui::TableNextColumn();
+					ImGui::Text(control.first);
+					ImGui::TableNextColumn();
+					ImGui::Text(control.second);
+				}
+				
+				ImGui::EndTable();
+			}
+			if (ImGui::Button("Retomar")) {
+				this->pause();
+			}
+			ImGui::End();
+		}
 
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
