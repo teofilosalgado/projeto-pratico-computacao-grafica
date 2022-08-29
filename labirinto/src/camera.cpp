@@ -27,7 +27,7 @@ void Camera::set_view_matrix() {
 	this->up = glm::normalize(glm::cross(this->right, this->center));
 
 	// Limita altura da câmera
-	if (this->eye.y > 1.0f) {
+	if (this->eye.y != 1.0f) {
 		this->eye.y = 1.0f;
 	}
 

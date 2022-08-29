@@ -23,5 +23,6 @@ public:
 
 	GLuint vertex_buffer;
 	GLuint uv_buffer;
+	GLuint normal_buffer;
 };
 

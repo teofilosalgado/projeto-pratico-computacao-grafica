@@ -1,6 +1,6 @@
 #include "scene.h"
 
-constexpr auto BUFFER_SIZE = 10000;
+constexpr auto BUFFER_SIZE = 100000;
 
 Scene::Scene(Shader* shader, Camera* camera)
 {
@@ -35,6 +35,11 @@ Scene::Scene(Shader* shader, Camera* camera)
 	glBindBuffer(GL_ARRAY_BUFFER, uv_buffer);
 	glBufferData(GL_ARRAY_BUFFER, BUFFER_SIZE, nullptr, GL_DYNAMIC_DRAW);
 
+	// Cria um VBO para as normais
+	glGenBuffers(1, &normal_buffer);
+	glBindBuffer(GL_ARRAY_BUFFER, normal_buffer);
+	glBufferData(GL_ARRAY_BUFFER, BUFFER_SIZE, nullptr, GL_DYNAMIC_DRAW);
+
 	// Mapeando o VBO de vértices para o VAO
 	glEnableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
@@ -53,6 +58,18 @@ Scene::Scene(Shader* shader, Camera* camera)
 	glVertexAttribPointer(
 		1,        // Posição do VBO
 		2,        // Tamanho
+		GL_FLOAT, // Tipo dos elementos
+		GL_FALSE, // Normalização
+		0,        // Stride
+		(void*)0  // Offset
+	);
+
+	// Mapeando o VBO de normais para o VAO
+	glEnableVertexAttribArray(2);
+	glBindBuffer(GL_ARRAY_BUFFER, uv_buffer);
+	glVertexAttribPointer(
+		2,        // Posição do VBO
+		3,        // Tamanho
 		GL_FLOAT, // Tipo dos elementos
 		GL_FALSE, // Normalização
 		0,        // Stride
@@ -94,6 +111,10 @@ void Scene::render(bool is_paused)
 		// Carrega as texturas (uvs) dos modelos no buffer dedicado
 		glBindBuffer(GL_ARRAY_BUFFER, this->uv_buffer);
 		glBufferSubData(GL_ARRAY_BUFFER, 0, object->model->uvs.size() * sizeof(glm::vec2), object->model->uvs.data());
+
+		// Carrega as normais dos modelos no buffer dedicado
+		glBindBuffer(GL_ARRAY_BUFFER, this->normal_buffer);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, object->model->normals.size() * sizeof(glm::vec3), object->model->normals.data());
 
 		// Desenha os vértices da cena
 		glDrawArrays(GL_TRIANGLES, 0, object->model->vertices.size());
