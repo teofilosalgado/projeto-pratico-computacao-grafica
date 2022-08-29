@@ -14,6 +14,10 @@ Scene::Scene(Shader* shader, Camera* camera)
 	this->view_uniform = glGetUniformLocation(this->shader->program_id, "view");
 	this->projection_uniform = glGetUniformLocation(this->shader->program_id, "projection");
 
+	// Obtém handles para as uniformes de iluminação no shader de fragmento
+	this->light_position_uniform = glGetUniformLocation(this->shader->program_id, "light_position");
+	this->light_intensity_uniform = glGetUniformLocation(this->shader->program_id, "light_intensity");
+
 	// Obtém um handle para a uniforme scale no shader de vértice responsável pela escala
 	this->scale_uniform = glGetUniformLocation(this->shader->program_id, "scale");
 
@@ -88,6 +92,10 @@ void Scene::render(bool is_paused)
 	// Define a VP para o shader sob a uniforme de mesmo nome
 	glUniformMatrix4fv(this->view_uniform, 1, GL_FALSE, &this->camera->view[0][0]);
 	glUniformMatrix4fv(this->projection_uniform, 1, GL_FALSE, &this->camera->projection[0][0]);
+
+	// Define a iluminação
+	glUniform3fv(this->light_position_uniform, 1, &glm::vec3(0.0f, 20.0f, 0.0f)[0]);
+	glUniform3fv(this->light_intensity_uniform, 1, &glm::vec3(2.0f, 2.0f, 2.0f)[0]);
 
 	for (Object* object : this->objects)
 	{

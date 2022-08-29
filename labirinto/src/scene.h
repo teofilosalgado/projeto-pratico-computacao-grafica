@@ -17,6 +17,9 @@ public:
 	GLuint view_uniform;
 	GLuint projection_uniform;
 
+	GLuint light_position_uniform;
+	GLuint light_intensity_uniform;
+
 	GLuint texture_uniform;
 
 	GLuint scale_uniform;
