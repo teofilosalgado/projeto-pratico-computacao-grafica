@@ -125,7 +125,7 @@ Window::Window(float width, float height, const char* title) {
 	ImGui_ImplOpenGL3_Init("#version 460");
 
 	// Cria uma câmera para as cenas
-	this->camera = new Camera(45.0f, this->width, this->height, 5.0, 5.0, glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+	this->camera = new Camera(45.0f, this->width, this->height, 5.0, 5.0, glm::vec3(5.0f, 1.0f, -7.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 }
 
 Window::~Window() {

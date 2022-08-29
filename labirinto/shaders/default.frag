@@ -4,13 +4,10 @@
 in vec3 fragment_position;
 in vec2 fragment_uv;
 in vec3 fragment_normal;
+in vec3 fragment_light_position;
 
 // Uniformes de iluminação
-uniform vec3 light_position;
 uniform vec3 light_intensity;
-
-// Uniforme de modelo
-uniform mat4 model;
 
 // Constante de unidade de textura
 uniform sampler2D sampler;
@@ -19,24 +16,17 @@ uniform sampler2D sampler;
 out vec4 color;
 
 void main() {
-	// Calcula a normal em coordenadas da cena
-    mat3 normal_matrix = transpose(inverse(mat3(model)));
-    vec3 normal = normalize(normal_matrix * fragment_normal);
+    // Luz ambiente
+    float ambient_strength = 0.5;
+    vec3 ambient = ambient_strength * light_intensity;
 
-	// Calcula a posição do pixel em relação a cena
-    vec3 position = vec3(model * vec4(fragment_position, 1));
+    // Luz difusa
+    vec3 normal = normalize(fragment_normal);
+    vec3 light_direction = normalize(fragment_light_position - fragment_position);
+    float diffusion = max(dot(normal, light_direction), 0.0);
+    vec3 diffuse = diffusion * light_intensity;
 
-	// Calcula o vetor da superfície até a fonte de iluminação
-    vec3 surface_to_light = light_position - position;
-
-	// Calcula o cosseno do ângulo de incidência
-	float brightness = dot(normal, surface_to_light) / (length(surface_to_light) * length(normal));
-    brightness = clamp(brightness, 0, 1);
-
-	// Calcula a cor final do pixel com base em:
-    // 1. O ângulo de incidência
-    // 2. A intensidade da luz
-    // 3. A textura
+    // Pixel resultante
     vec4 surface_color = texture(sampler, fragment_uv);
-    color = vec4(brightness * light_intensity * surface_color.rgb, surface_color.a);
+    color = vec4((ambient + diffuse) * surface_color.rgb, surface_color.a);
 }

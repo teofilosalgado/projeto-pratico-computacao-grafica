@@ -70,7 +70,7 @@ Scene::Scene(Shader* shader, Camera* camera)
 
 	// Mapeando o VBO de normais para o VAO
 	glEnableVertexAttribArray(2);
-	glBindBuffer(GL_ARRAY_BUFFER, uv_buffer);
+	glBindBuffer(GL_ARRAY_BUFFER, normal_buffer);
 	glVertexAttribPointer(
 		2,        // Posição do VBO
 		3,        // Tamanho
@@ -95,7 +95,7 @@ void Scene::render(bool is_paused)
 
 	// Define a iluminação
 	glUniform3fv(this->light_position_uniform, 1, &glm::vec3(0.0f, 20.0f, 0.0f)[0]);
-	glUniform3fv(this->light_intensity_uniform, 1, &glm::vec3(2.0f, 2.0f, 2.0f)[0]);
+	glUniform3fv(this->light_intensity_uniform, 1, &glm::vec3(1.0f, 1.0f, 1.0f)[0]);
 
 	for (Object* object : this->objects)
 	{

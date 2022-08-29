@@ -9,7 +9,7 @@ Level::Level(Camera* camera)
 	this->scene = new Scene(shader, camera);
 
 	// Carrega a textura
-	Texture* white_texture = new Texture("assets\\textures\\white.png");
+	Texture* white_texture = new Texture("assets\\textures\\stone.png");
 
 	// Lê o modelo
 	Model* map_model = new Model("assets\\models\\map", "map.obj");
@@ -17,8 +17,8 @@ Level::Level(Camera* camera)
 
 	// Cria um objeto para o cubo
 	Object* map = new Object(map_model, white_texture, glm::vec3(0.0f, 0.0f, 0.0f), 1.0f);
-	Object* cube = new Object(cube_model, white_texture, glm::vec3(0.0f, 0.0f, 0.0f), 1.0f);
-	scene->objects.push_back(cube);
+	Object* cube = new Object(cube_model, white_texture, glm::vec3(2.0f, -2.0f, 2.0f), 1.0f);
+	scene->objects.push_back(map);
 }
 
 void Level::run(bool is_paused)
