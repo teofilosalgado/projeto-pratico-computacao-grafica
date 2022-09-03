@@ -9,6 +9,7 @@ Texture::Texture(const char* texture_file_path)
     int height = 0;
     stbi_uc* tex_data = NULL;
     std::cout << "Lendo textura: " << texture_file_path << std::endl;
+    stbi_set_flip_vertically_on_load(1);
     tex_data = stbi_load(texture_file_path, &width, &height, NULL, STBI_rgb_alpha);
     if (!tex_data) {
         std::cerr << "Erro ao ler o arquivo: " << texture_file_path << std::endl;

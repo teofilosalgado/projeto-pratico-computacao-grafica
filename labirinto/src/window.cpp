@@ -8,6 +8,7 @@ static std::map<const char*, const char*> controls = {
 	{"S", "Andar pra trás"},
 	{"A", "Andar pra esquerda"},
 	{"D", "Andar pra direita"},
+	{"L", "Ativar/desativar a iluminação"},
 	{"Mouse", "Câmera"},
 };
 
@@ -23,18 +24,23 @@ static void key_callback(GLFWwindow* window, int key, int scan_code, int action,
 	if (key == GLFW_KEY_P && action == GLFW_PRESS) {
 		handler->pause();
 	}
+	if (key == GLFW_KEY_L && action != GLFW_PRESS) {
+		handler->level->scene->toggle_light();
+	}
+
 	if (key == GLFW_KEY_W && action != GLFW_RELEASE) {
-		handler->camera->move_eye(FORWARD, handler->delta);
+		handler->level->camera->move_eye(FORWARD, handler->delta);
 	}
 	if (key == GLFW_KEY_A && action != GLFW_RELEASE) {
-		handler->camera->move_eye(LEFT, handler->delta);
+		handler->level->camera->move_eye(LEFT, handler->delta);
 	}
 	if (key == GLFW_KEY_S && action != GLFW_RELEASE) {
-		handler->camera->move_eye(BACKWARD, handler->delta);
+		handler->level->camera->move_eye(BACKWARD, handler->delta);
 	}
 	if (key == GLFW_KEY_D && action != GLFW_RELEASE) {
-		handler->camera->move_eye(RIGHT, handler->delta);
+		handler->level->camera->move_eye(RIGHT, handler->delta);
 	}
+
 }
 
 static void cursor_pos_callback(GLFWwindow* window, double x_position, double y_position) {
@@ -55,7 +61,7 @@ static void cursor_pos_callback(GLFWwindow* window, double x_position, double y_
 	handler->last_cursor_x_position = x_position;
 	handler->last_cursor_y_position = y_position;
 
-	handler->camera->move_center(x_offset, y_offset, handler->delta);
+	handler->level->camera->move_center(x_offset, y_offset, handler->delta);
 }
 
 Window::Window(float width, float height, const char* title) {
@@ -124,8 +130,8 @@ Window::Window(float width, float height, const char* title) {
 	ImGui_ImplGlfw_InitForOpenGL(this->window, true);
 	ImGui_ImplOpenGL3_Init("#version 460");
 
-	// Cria uma câmera para as cenas
-	this->camera = new Camera(45.0f, this->width, this->height, 5.0, 5.0, glm::vec3(5.0f, 1.0f, -7.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+	// Nível do jogo
+	this->level = new Level(this->width, this->height);
 }
 
 Window::~Window() {
@@ -144,9 +150,6 @@ void Window::pause() {
 }
 
 void Window::run() {
-	// Nível do jogo
-	Level* level = new Level(camera);
-
 	while (!glfwWindowShouldClose(window)) {
 		// Limita o FPS das cenas
 		double current_time = glfwGetTime();

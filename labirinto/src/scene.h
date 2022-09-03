@@ -8,7 +8,8 @@ class Scene
 public:
 	Scene(Shader* shader, Camera* camera);
 	void render(bool is_paused);
-
+	void toggle_light();
+	
 	Shader* shader;
 	Camera* camera;
 	std::vector<Object*> objects;
@@ -27,5 +28,8 @@ public:
 	GLuint vertex_buffer;
 	GLuint uv_buffer;
 	GLuint normal_buffer;
+private:
+	bool is_light_on;
+	glm::vec3 light_intensity;
 };
 

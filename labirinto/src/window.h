@@ -18,11 +18,11 @@ public:
 	~Window();
 	void run();
 	GLFWwindow* window;
+	Level* level;
 	void pause();
 	bool is_paused;
 
 	// Controles para a câmera
-	Camera* camera;
 	float last_cursor_x_position;
 	float last_cursor_y_position;
 	bool first_mouse;

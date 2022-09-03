@@ -7,6 +7,8 @@ Scene::Scene(Shader* shader, Camera* camera)
 	// Inicializa as variáveis
 	this->shader = shader;
 	this->camera = camera;
+	this->is_light_on = false;
+	this->light_intensity = glm::vec3(0.2f, 0.2f, 0.2f);
 
 	// Inicializa as uniformes
 	// Obtém um handle para cada uniforme no shader de vértice responsável pela matriz mvp
@@ -95,7 +97,7 @@ void Scene::render(bool is_paused)
 
 	// Define a iluminação
 	glUniform3fv(this->light_position_uniform, 1, &glm::vec3(0.0f, 20.0f, 0.0f)[0]);
-	glUniform3fv(this->light_intensity_uniform, 1, &glm::vec3(1.0f, 1.0f, 1.0f)[0]);
+	glUniform3fv(this->light_intensity_uniform, 1, &this->light_intensity[0]);
 
 	for (Object* object : this->objects)
 	{
@@ -132,6 +134,15 @@ void Scene::render(bool is_paused)
 	if (is_paused) {
 		return;
 	}
+}
 
-	// Animações dos objetos
+void Scene::toggle_light()
+{
+	if (this->is_light_on) {
+		this->light_intensity = glm::vec3(0.2f, 0.2f, 0.3f);
+	}
+	else {
+		this->light_intensity = glm::vec3(1.0f, 0.9f, 0.9f);
+	}
+	this->is_light_on = !this->is_light_on;
 }

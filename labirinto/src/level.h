@@ -9,9 +9,10 @@
 class Level
 {
 public:
-	Level(Camera* camera);
-	void run(bool is_paused);
-private:
+	Level(float width, float height);
 	Scene* scene;
+	Camera* camera;
+	void run(bool is_paused);
+	bool is_ended;
 };
 
