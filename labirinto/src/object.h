@@ -8,6 +8,7 @@ public:
 	Object(Model* model, Texture* texture, glm::vec3 coordinates, float scale);
 	void move_to(glm::vec3 coordinates);
 	void move(glm::vec3 delta_coordinates);
+	void rotate(float angle, glm::vec3 axis);
 
 	glm::mat4 position;
 	Model* model;

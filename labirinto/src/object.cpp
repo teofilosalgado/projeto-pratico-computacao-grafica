@@ -20,3 +20,7 @@ void Object::move(glm::vec3 delta_coordinates)
 	this->coordinates += delta_coordinates;
 	this->position = glm::translate(glm::mat4(1.0f), this->coordinates);
 }
+
+void Object::rotate(float angle, glm::vec3 axis) {
+	this->position = glm::rotate(this->position, glm::radians(angle), axis);
+}
